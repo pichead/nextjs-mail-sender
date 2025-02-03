@@ -1,5 +1,4 @@
 "use client"
-import { MAIL } from "@/utils/email";
 import React, { useState } from "react";
 
 export default function Home() {
@@ -40,7 +39,7 @@ export default function Home() {
       reader.onload = (e) => {
         const textData = e.target?.result as string;
         const arr = textData.split("\n");
-        let dataArr = [];
+        const dataArr = [];
         for (let i = 0; i < arr.length; i++) {
           dataArr.push({
             no: i + 1,
@@ -62,7 +61,7 @@ export default function Home() {
     if (!onProgress) {
       setOnProgress(true)
       for (let i = 0; i < email.length; i++) {
-        let arrMail = [...email]
+        const arrMail = [...email]
         try {
           const res = await fetch("/api/mail", {
             method: "POST",
@@ -83,7 +82,7 @@ export default function Home() {
           setEmail([...arrMail]);
 
         } catch (error) {
-
+          console.log(error)
           arrMail[i].status = "fail";
           setEmail([...arrMail]);
 
