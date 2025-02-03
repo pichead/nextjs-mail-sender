@@ -1,4 +1,5 @@
 "use client"
+import { MAIL } from "@/utils/email";
 import React, { useState } from "react";
 
 export default function Home() {
@@ -10,6 +11,8 @@ export default function Home() {
     email: string,
     status: string
   }[]>([]);
+
+  const [onProgress, setOnProgress] = useState<boolean>(false);
 
 
   const fileTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,15 +58,53 @@ export default function Home() {
     }
   }
 
+  const sendMail = async () => {
+    if (!onProgress) {
+      setOnProgress(true)
+      for (let i = 0; i < email.length; i++) {
+        let arrMail = [...email]
+        try {
+          const res = await fetch("/api/mail", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              email: email[i].email,
+              text: template
+            })
+          })
+          const resJson = await res.json()
+          if (resJson.statusCode === 200) {
+            arrMail[i].status = "success";
+          } else {
+            arrMail[i].status = "fail";
+          }
+          setEmail([...arrMail]);
+
+        } catch (error) {
+
+          arrMail[i].status = "fail";
+          setEmail([...arrMail]);
+
+        }
+
+      }
+      setOnProgress(false)
+    }
+  }
+
   return (
     <React.Fragment>
-      <div className="w-[50%] mx-auto mt-[200px]">
+      <div className="w-[50%] mx-auto my-[100px]">
+        <div className="text-white text-center text-bold text-[30px]">Email Sender</div>
+
         <div className="text-white">ข้อความ</div>
         <div>
           <input type="file" className="" onChange={fileTextChange} />
         </div>
-        <textarea className="bg-white rounded-[10px] p-3 w-full" value={template} onChange={(e) => setTemplate(e.target.value)} />
-
+        <textarea className="bg-white rounded-[10px] p-3 w-full" rows={5} value={template} onChange={(e) => setTemplate(e.target.value)} />
+        {/* <div className="">{template}</div> */}
         <div className="text-white">Email</div>
         <div>
           <input type="file" className="" onChange={fileEmailChange} />
@@ -83,7 +124,8 @@ export default function Home() {
                 <tr key={"email_" + i} className="text-white bg-blue-400 text-center">
                   <td className="py-2">{m.no}</td>
                   <td className="py-2">{m.email}</td>
-                  <td className="py-2">{m.status}</td>
+                  <td className="py-2">
+                    <div className={`px-2 py-1 rounded-[10px]  ${m.status === "prepare" ? " bg-slate-700 text-white " : (m.status === "success" ? " bg-green-700 text-white " : " bg-red-700 text-white ")} `}>{m.status}</div></td>
                 </tr>
               ))}
             </tbody>
@@ -95,7 +137,10 @@ export default function Home() {
         <div className="text-end text-white">Success total : {email.filter((f) => f.status === "success").length} Email</div>
         <br />
         <br />
-        <button className="text-white bg-blue-950 px-3 py-2 rounded-[12px]" type="button">Sendmail</button>
+        <div className="flex justify-end">
+
+          <button className="text-white bg-blue-700 px-3 py-2 rounded-[12px] text-[20px] text-bold" type="button" disabled={onProgress} onClick={sendMail}>{onProgress ? "Sending ... " : "Sendmail"}</button>
+        </div>
       </div>
     </React.Fragment>
   );
