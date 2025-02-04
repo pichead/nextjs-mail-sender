@@ -6,20 +6,22 @@ import { NextResponse } from 'next/server';
 interface RequestBody {
     email: string;
     text: string;
+    emailSender: string;
+    emailPassword: string;
 }
 
 export async function POST(request: Request) {
     try {
         // รับข้อมูลจาก request body
         const body: RequestBody = await request.json();
-        const { email, text } = body;
+        const { email, text, emailSender, emailPassword } = body;
 
         // ตรวจสอบข้อมูล
         if (!email || !text) {
             return NextResponse.json({ error: 'text and email are required' }, { status: 400 });
         }
 
-        const sendResult = await MAIL.sendAds(email, text);
+        const sendResult = await MAIL.sendAdsCustom(email, text, emailSender, emailPassword);
         // ทำบางอย่างกับข้อมูล (เช่น บันทึกลงฐานข้อมูล)
         // ในตัวอย่างนี้เราจะแค่ส่งข้อมูลกลับไป
 

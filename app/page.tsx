@@ -70,11 +70,13 @@ export default function Home() {
             },
             body: JSON.stringify({
               email: email[i].email,
-              text: template
+              text: template,
+              emailSender: emailSender,
+              emailPassword: emailPassword
             })
           })
           const resJson = await res.json()
-          if (resJson.statusCode === 200) {
+          if (resJson.statusCode === 200 && resJson.data.sendResult !== null) {
             arrMail[i].status = "success";
           } else {
             arrMail[i].status = "fail";
@@ -93,11 +95,24 @@ export default function Home() {
     }
   }
 
+  const [emailSender, setEmailSender] = useState<string>("")
+  const [emailPassword, setEmailPassword] = useState<string>("")
+
+
   return (
     <React.Fragment>
       <div className="w-[50%] mx-auto my-[100px]">
         <div className="text-white text-center text-bold text-[30px]">Email Sender</div>
 
+        <div className="text-white">Email Sender</div>
+        <div>
+          <input type="text" className="p-2 rounded-[12px] text-black" placeholder="กรุณาระบุ email" onChange={(e) => setEmailSender(e.target.value)} />
+        </div>
+        <div className="text-white">Email Password</div>
+        <div>
+          <input type="password" className="p-2 rounded-[12px] text-black"  placeholder="กรุณาระบุ app password" onChange={(e) => setEmailPassword(e.target.value)} />
+        </div>
+        <br />
         <div className="text-white">ข้อความ</div>
         <div>
           <input type="file" className="" onChange={fileTextChange} />

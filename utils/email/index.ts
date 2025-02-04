@@ -61,6 +61,45 @@ const sendMailAds = async (
 };
 
 
+const sendAdsCustom = async (
+  to: string,
+  detail: string,
+  emailSender: string,
+  emailPassword: string
+) => {
+  try {
+    const subject = 'Ads'
+    const text = 'Ads'
+
+    const senderEmail = mailUser;
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: emailSender,
+        pass: emailPassword,
+      },
+    });
+
+    const message = {
+      from: `"promo" <${senderEmail}>`,
+      to,
+      subject,
+      text,
+      html: HTML.htmlPromo(detail),
+    };
+
+    return await sendMail(transporter, message);
+  } catch (error) {
+    console.log('Error at send mail ads');
+    console.log(error);
+    return null;
+  }
+};
+
 export const MAIL = {
   sendAds: sendMailAds,
+  sendAdsCustom: sendAdsCustom,
 };
